@@ -578,6 +578,9 @@ public class TestSslUtils {
         String algorithm;
         CertificateBuilder certBuilder;
         boolean usePem;
+        boolean sslHotReload;
+        int sslHotReloadPollInterval;
+        int debounceDelaySeconds;
 
         public SslConfigsBuilder(ConnectionMode connectionMode) {
             this.connectionMode = connectionMode;
@@ -590,6 +593,9 @@ public class TestSslUtils {
             this.certAlias = connectionMode.name().toLowerCase(Locale.ROOT);
             this.algorithm = "RSA";
             this.createTrustStore = true;
+            this.sslHotReload = false;
+            this.sslHotReloadPollInterval = SslConfigs.DEFAULT_SSL_HOT_RELOAD_POLL_INTERVAL_SECONDS;
+            this.debounceDelaySeconds = SslConfigs.DEFAULT_SSL_HOT_RELOAD_DEBOUNCE_SECONDS;
         }
 
         public SslConfigsBuilder tlsProtocol(String tlsProtocol) {
@@ -636,6 +642,21 @@ public class TestSslUtils {
 
         public SslConfigsBuilder usePem(boolean usePem) {
             this.usePem = usePem;
+            return this;
+        }
+
+        public SslConfigsBuilder sslHotReload(boolean sslHotReload) {
+            this.sslHotReload = sslHotReload;
+            return this;
+        }
+
+        public SslConfigsBuilder sslHotReloadPollInterval(int sslHotReloadPollInterval) {
+            this.sslHotReloadPollInterval = sslHotReloadPollInterval;
+            return this;
+        }
+
+        public SslConfigsBuilder sslHotReloadDebounce(int debounceDelaySeconds) {
+            this.debounceDelaySeconds = debounceDelaySeconds;
             return this;
         }
 
@@ -690,6 +711,10 @@ public class TestSslUtils {
             List<String> enabledProtocols  = new ArrayList<>();
             enabledProtocols.add(tlsProtocol);
             sslConfigs.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, enabledProtocols);
+
+            sslConfigs.put(SslConfigs.SSL_HOT_RELOAD_ENABLE_CONFIG, sslHotReload);
+            sslConfigs.put(SslConfigs.SSL_HOT_RELOAD_POLL_INTERVAL_CONFIG, sslHotReloadPollInterval);
+            sslConfigs.put(SslConfigs.SSL_HOT_RELOAD_DEBOUNCE_CONFIG, debounceDelaySeconds);
 
             return sslConfigs;
         }
